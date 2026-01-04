@@ -37,12 +37,32 @@
 <script>
 let budget = 0;
 let remaining = 0;
+let purchases = [];
+
+// Load saved data
+window.onload = function() {
+  budget = parseFloat(localStorage.getItem('budget')) || 0;
+  remaining = parseFloat(localStorage.getItem('remaining')) || budget;
+  purchases = JSON.parse(localStorage.getItem('purchases')) || [];
+  document.getElementById('remaining').textContent = remaining;
+  document.getElementById('budgetInput').value = budget || '';
+  renderHistory();
+};
+
+function saveData() {
+  localStorage.setItem('budget', budget);
+  localStorage.setItem('remaining', remaining);
+  localStorage.setItem('purchases', JSON.stringify(purchases));
+}
 
 function setBudget() {
   const input = document.getElementById('budgetInput').value;
   budget = parseFloat(input) || 0;
   remaining = budget;
+  purchases = [];
   document.getElementById('remaining').textContent = remaining;
+  renderHistory();
+  saveData();
 }
 
 function addItem() {
@@ -62,34 +82,45 @@ function addItem() {
   remaining -= price;
   document.getElementById('remaining').textContent = remaining;
 
-  const historyDiv = document.getElementById('history');
-  const itemDiv = document.createElement('div');
-  itemDiv.classList.add('item');
-  itemDiv.innerHTML = `${name} - ₹${price} <button onclick="removeItem(this, ${price})">Remove</button>`;
-  historyDiv.appendChild(itemDiv);
+  const item = { name, price };
+  purchases.push(item);
+  renderHistory();
+  saveData();
 
   document.getElementById('itemName').value = '';
   document.getElementById('itemPrice').value = '';
 }
 
-function removeItem(button, price) {
-  remaining += price;
+function removeItem(index) {
+  remaining += purchases[index].price;
+  purchases.splice(index, 1);
   document.getElementById('remaining').textContent = remaining;
-  button.parentElement.remove();
+  renderHistory();
+  saveData();
+}
+
+function renderHistory() {
+  const historyDiv = document.getElementById('history');
+  historyDiv.innerHTML = '<h3>Purchase History</h3>';
+  purchases.forEach((item, i) => {
+    const itemDiv = document.createElement('div');
+    itemDiv.classList.add('item');
+    itemDiv.innerHTML = `${item.name} - ₹${item.price} <button onclick="removeItem(${i})">Remove</button>`;
+    historyDiv.appendChild(itemDiv);
+  });
 }
 
 function resetBudget() {
   budget = 0;
   remaining = 0;
+  purchases = [];
   document.getElementById('remaining').textContent = remaining;
   document.getElementById('budgetInput').value = '';
-  document.getElementById('itemName').value = '';
-  document.getElementById('itemPrice').value = '';
-  document.getElementById('history').innerHTML = '<h3>Purchase History</h3>';
+  renderHistory();
+  saveData();
 }
 </script>
-<footer>&copy 2026 - 2026 | Designed by Vinivex Studio
-</footer>
+<footer>&copy 2026-2026 | <a href="https://vineetkrishnaswain.github.io/vinivexstudio/"> Designed by Vinivex Studio</a>
 
 </body>
 </html>
