@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Budget Tracker</title>
+<style>
+  body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4; }
+  h2 { color: #333; }
+  input { padding: 8px; margin: 5px 0; width: 100%; box-sizing: border-box; }
+  button { padding: 8px 12px; margin: 5px 0; cursor: pointer; border-radius: 6px; border: none; background: #48b1bf; color: white; }
+  .item { margin: 5px 0; padding: 5px; background: #fff; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; }
+  .item button { background: red; padding: 3px 6px; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<h2>Budget Tracker</h2>
+
+<label>Set Budget:</label>
+<input type="number" id="budgetInput" placeholder="Enter your budget">
+<button onclick="setBudget()">Set Budget</button>
+
+<h3>Remaining Budget: ₹<span id="remaining">0</span></h3>
+
+<label>Item Name:</label>
+<input type="text" id="itemName" placeholder="Enter item name">
+<label>Item Price:</label>
+<input type="number" id="itemPrice" placeholder="Enter item price">
+<button onclick="addItem()">Add Item</button>
+<button onclick="resetBudget()">Reset Budget</button>
+
+<div id="history">
+  <h3>Purchase History</h3>
+</div>
+
+<script>
+let budget = 0;
+let remaining = 0;
+
+function setBudget() {
+  const input = document.getElementById('budgetInput').value;
+  budget = parseFloat(input) || 0;
+  remaining = budget;
+  document.getElementById('remaining').textContent = remaining;
+}
+
+function addItem() {
+  const name = document.getElementById('itemName').value.trim();
+  const price = parseFloat(document.getElementById('itemPrice').value);
+
+  if(!name || isNaN(price) || price <= 0) {
+    alert('Enter valid name and price');
+    return;
+  }
+
+  if(price > remaining) {
+    alert('Not enough budget!');
+    return;
+  }
+
+  remaining -= price;
+  document.getElementById('remaining').textContent = remaining;
+
+  const historyDiv = document.getElementById('history');
+  const itemDiv = document.createElement('div');
+  itemDiv.classList.add('item');
+  itemDiv.innerHTML = `${name} - ₹${price} <button onclick="removeItem(this, ${price})">Remove</button>`;
+  historyDiv.appendChild(itemDiv);
+
+  document.getElementById('itemName').value = '';
+  document.getElementById('itemPrice').value = '';
+}
+
+function removeItem(button, price) {
+  remaining += price;
+  document.getElementById('remaining').textContent = remaining;
+  button.parentElement.remove();
+}
+
+function resetBudget() {
+  budget = 0;
+  remaining = 0;
+  document.getElementById('remaining').textContent = remaining;
+  document.getElementById('budgetInput').value = '';
+  document.getElementById('itemName').value = '';
+  document.getElementById('itemPrice').value = '';
+  document.getElementById('history').innerHTML = '<h3>Purchase History</h3>';
+}
+</script>
+<footer>&copy 2026 - 2026 | Designed by Vinivex Studio
+</footer>
+
+</body>
+</html>
