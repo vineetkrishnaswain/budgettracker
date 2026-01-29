@@ -3,125 +3,301 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="google-site-verification" content="iLUi82GE6e8J6ajVT-l_xSgJxguBA3ZABCFrQYyWZuA" />
 <title>Budget Tracker</title>
 <style>
-  body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4; }
-  h2 { color: #333; }
-  input { padding: 8px; margin: 5px 0; width: 100%; box-sizing: border-box; }
-  button { padding: 8px 12px; margin: 5px 0; cursor: pointer; border-radius: 6px; border: none; background: #48b1bf; color: white; }
-  .item { margin: 5px 0; padding: 5px; background: #fff; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; }
-  .item button { background: red; padding: 3px 6px; font-size: 12px; }
+/* --- RESET & BODY --- */
+* { box-sizing: border-box; margin:0; padding:0; font-family: Arial, Helvetica, sans-serif; }
+body { background-color: aliceblue; display:flex; flex-direction:column; align-items:center; min-height:100vh; }
+
+/* --- HEADER --- */
+header {
+    text-align:center; 
+    margin:20px 0;
+}
+header h1 { font-size:2em; color:#2563eb; }
+header p { font-size:1em; color:gray; margin-top:5px; }
+
+/* --- CONTAINER --- */
+.container {
+    width: 95%;
+    max-width: 700px;
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+    flex:1;
+}
+
+/* --- BOXES --- */
+.box {
+    background:white;
+    padding:20px;
+    border-radius:15px;
+    flex-shrink:0;
+}
+.box h2.a { color:#2563eb; margin-bottom:5px; }
+.box p.b { color:gray; font-size:14px; margin-bottom:10px; }
+
+/* --- INPUTS & BUTTONS --- */
+input.c { width:100%; padding:10px; margin:8px 0; border-radius:7px; border:1px solid #ccc; font-size:1em; }
+button.d { width:100%; padding:10px; border:none; border-radius:7px; color:white; background:#2563eb; cursor:pointer; font-size:1em; margin-top:5px; }
+button.extend { background:#16a34a; }
+button.reset { background:#dc2626; }
+button.backup { background:#f59e0b; }
+
+/* --- SUMMARY CARDS --- */
+.summary { display:flex; gap:10px; margin-top:15px; }
+.card { flex:1; color:white; padding:15px; border-radius:10px; text-align:center; }
+.card.blue { background:#2563eb; }
+.card.green { background:#16a34a; }
+
+/* --- EXPENSE LIST --- */
+ul { padding-left:0; margin-top:10px; max-height:200px; overflow-y:auto; }
+li { list-style:none; background:#f1f5f9; margin:8px 0; padding:8px; border-radius:7px; display:flex; justify-content:space-between; align-items:center; }
+.remove { background:#dc2626; color:white; border:none; border-radius:5px; padding:5px 8px; cursor:pointer; }
+
+/* --- FOOTER --- */
+footer {
+    text-align:center;
+    color:gray;
+    font-size:14px;
+    margin-top:10px;
+}
+
+footer a:hover { color:blueviolet; text-decoration:none; }
+
+/* --- RESPONSIVE --- */
+@media(max-width:450px){
+    .summary { flex-direction:column; }
+    button.d { font-size:0.9em; padding:8px; }
+    input.c { font-size:0.9em; padding:8px; }
+}
 </style>
 </head>
 <body>
 
-<h2>Budget Tracker</h2>
+<header>
+    <h1>Budget Tracker</h1>
+    <p>Track your expenses and manage your money efficiently</p>
+</header>
 
-<label>Set Budget:</label>
-<input type="number" id="budgetInput" placeholder="Enter your budget">
-<button onclick="setBudget()">Set Budget</button>
+<div class="container">
 
-<h3>Remaining Budget: ₹<span id="remaining">0</span></h3>
+  <!-- BUDGET SECTION -->
+  <div class="box">
+    <h2 class="a">Set Your Budget</h2>
+    <p class="b">Define, extend, reset, backup or restore your budget</p>
 
-<label>Item Name:</label>
-<input type="text" id="itemName" placeholder="Enter item name">
-<label>Item Price:</label>
-<input type="number" id="itemPrice" placeholder="Enter item price">
-<button onclick="addItem()">Add Item</button>
-<button onclick="resetBudget()">Reset Budget</button>
+    <input id="budgetInput" class="c" type="number" placeholder="₹ 0.00">
+    <button class="d" id="setBudgetBtn">Set Budget</button>
+    <button class="d extend" id="extendBudgetBtn">Extend Budget</button>
+    <button class="d reset" id="resetBudgetBtn">Reset Budget</button>
+    <button class="d backup" id="backupBtn">Backup Data</button>
+    <input type="file" id="restoreInput" class="c" style="display:none;" accept=".json">
+    <button class="d backup" id="restoreBtn">Restore Data</button>
 
-<div id="history">
-  <h3>Purchase History</h3>
+    <div class="summary">
+      <div class="card blue">
+        <div>Total Budget</div>
+        <h2>₹<span id="totalBudget">0</span></h2>
+      </div>
+      <div class="card green">
+        <div>Remaining</div>
+        <h2>₹<span id="remainingBudget">0</span></h2>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPENSE SECTION -->
+  <div class="box">
+    <h2 class="a">Add Expense</h2>
+    <p class="b">Track where your money goes</p>
+
+    <input id="itemName" class="c" type="text" placeholder="Item name">
+    <input id="itemPrice" class="c" type="number" placeholder="₹ 0.00">
+
+    <button class="d" id="addExpenseBtn">+ Add Item</button>
+
+    <h3 class="a">Expenses</h3>
+    <ul id="expenseList"></ul>
+  </div>
+
 </div>
 
+<footer>
+    © 2026 | All rights reserved | <a href="https://vineetkrishnaswain.github.io/vinivexstudio/">Vinivex Studio</a>
+</footer>
+
 <script>
-let budget = 0;
-let remaining = 0;
-let purchases = [];
+let totalBudget = 0;
+let remainingBudget = 0;
+let expenses = [];
 
-// Load saved data
-window.onload = function() {
-  budget = parseFloat(localStorage.getItem('budget')) || 0;
-  remaining = parseFloat(localStorage.getItem('remaining')) || budget;
-  purchases = JSON.parse(localStorage.getItem('purchases')) || [];
-  document.getElementById('remaining').textContent = remaining;
-  document.getElementById('budgetInput').value = budget || '';
-  renderHistory();
-};
+// ===== MIGRATE OLD STORAGE =====
+(function migrateOldStorage() {
+    if(localStorage.getItem("newBudget")) return;
+    const oldBudget = localStorage.getItem("budget");
+    const oldRemaining = localStorage.getItem("remaining");
+    const oldPurchases = localStorage.getItem("purchases");
+    if(oldBudget && oldPurchases){
+        totalBudget = Number(oldBudget);
+        remainingBudget = Number(oldRemaining);
+        expenses = JSON.parse(oldPurchases);
+        saveNewData();
+        localStorage.removeItem("budget");
+        localStorage.removeItem("remaining");
+        localStorage.removeItem("purchases");
+    }
+})();
 
-function saveData() {
-  localStorage.setItem('budget', budget);
-  localStorage.setItem('remaining', remaining);
-  localStorage.setItem('purchases', JSON.stringify(purchases));
+// ===== SAVE / LOAD =====
+function saveNewData(){
+    localStorage.setItem("newBudget", totalBudget);
+    localStorage.setItem("newRemaining", remainingBudget);
+    localStorage.setItem("newExpenses", JSON.stringify(expenses));
 }
 
-function setBudget() {
-  const input = document.getElementById('budgetInput').value;
-  budget = parseFloat(input) || 0;
-  remaining = budget;
-  purchases = [];
-  document.getElementById('remaining').textContent = remaining;
-  renderHistory();
-  saveData();
+function loadNewData(){
+    const b = localStorage.getItem("newBudget");
+    const r = localStorage.getItem("newRemaining");
+    const e = localStorage.getItem("newExpenses");
+    if(!b || !r || !e) return;
+    totalBudget = Number(b);
+    remainingBudget = Number(r);
+    expenses = JSON.parse(e);
+    renderExpenses();
+    updateUI();
 }
 
-function addItem() {
-  const name = document.getElementById('itemName').value.trim();
-  const price = parseFloat(document.getElementById('itemPrice').value);
-
-  if(!name || isNaN(price) || price <= 0) {
-    alert('Enter valid name and price');
-    return;
-  }
-
-  if(price > remaining) {
-    alert('Not enough budget!');
-    return;
-  }
-
-  remaining -= price;
-  document.getElementById('remaining').textContent = remaining;
-
-  const item = { name, price };
-  purchases.push(item);
-  renderHistory();
-  saveData();
-
-  document.getElementById('itemName').value = '';
-  document.getElementById('itemPrice').value = '';
+// ===== UPDATE UI =====
+function updateUI(){
+    document.getElementById("totalBudget").textContent = totalBudget;
+    document.getElementById("remainingBudget").textContent = remainingBudget;
 }
 
-function removeItem(index) {
-  remaining += purchases[index].price;
-  purchases.splice(index, 1);
-  document.getElementById('remaining').textContent = remaining;
-  renderHistory();
-  saveData();
+// ===== RENDER EXPENSES =====
+function renderExpenses(){
+    const list = document.getElementById("expenseList");
+    list.innerHTML = "";
+    expenses.forEach((item,i)=>{
+        const li = document.createElement("li");
+        li.innerHTML = `<span>${item.name} - ₹${item.price}</span>
+                        <button class="remove">X</button>`;
+        li.querySelector(".remove").onclick = ()=>{
+            remainingBudget += item.price;
+            expenses.splice(i,1);
+            saveNewData();
+            renderExpenses();
+            updateUI();
+        };
+        list.appendChild(li);
+    });
 }
 
-function renderHistory() {
-  const historyDiv = document.getElementById('history');
-  historyDiv.innerHTML = '<h3>Purchase History</h3>';
-  purchases.forEach((item, i) => {
-    const itemDiv = document.createElement('div');
-    itemDiv.classList.add('item');
-    itemDiv.innerHTML = `${item.name} - ₹${item.price} <button onclick="removeItem(${i})">Remove</button>`;
-    historyDiv.appendChild(itemDiv);
-  });
+// ===== BUTTONS =====
+document.getElementById("setBudgetBtn").onclick = ()=>{
+    const val = Number(document.getElementById("budgetInput").value);
+    if(val<=0) return alert("Enter valid budget");
+    if(totalBudget>0){
+        if(!confirm("Changing budget will delete all expenses. Continue?")) return;
+        expenses=[];
+    }
+    totalBudget = val;
+    remainingBudget = val;
+    renderExpenses();
+    updateUI();
+    saveNewData();
+    document.getElementById("budgetInput").value="";
 }
 
-function resetBudget() {
-  budget = 0;
-  remaining = 0;
-  purchases = [];
-  document.getElementById('remaining').textContent = remaining;
-  document.getElementById('budgetInput').value = '';
-  renderHistory();
-  saveData();
+document.getElementById("extendBudgetBtn").onclick = ()=>{
+    const val = Number(document.getElementById("budgetInput").value);
+    if(val<=0) return alert("Enter valid amount");
+    totalBudget += val;
+    remainingBudget += val;
+    updateUI();
+    saveNewData();
+    document.getElementById("budgetInput").value="";
 }
+
+document.getElementById("resetBudgetBtn").onclick = ()=>{
+    if(!confirm("This will reset budget and delete all expenses. Continue?")) return;
+    totalBudget=0;
+    remainingBudget=0;
+    expenses=[];
+    renderExpenses();
+    updateUI();
+    saveNewData();
+    document.getElementById("budgetInput").value="";
+}
+
+// Add Expense with proper warning
+document.getElementById("addExpenseBtn").onclick = ()=>{
+    const name = document.getElementById("itemName").value.trim();
+    const priceInput = document.getElementById("itemPrice").value.trim();
+    const price = Number(priceInput);
+    if(!name || isNaN(price) || price <= 0){
+        alert("Enter valid item name and price");
+        return;
+    }
+    if(price > remainingBudget){
+        alert("Cannot add this item. Not enough remaining budget!");
+        return;
+    }
+    expenses.push({name, price});
+    remainingBudget -= price;
+    renderExpenses();
+    updateUI();
+    saveNewData();
+    document.getElementById("itemName").value="";
+    document.getElementById("itemPrice").value="";
+}
+
+// Backup
+document.getElementById("backupBtn").onclick = ()=>{
+    const data = { totalBudget, remainingBudget, expenses };
+    const blob = new Blob([JSON.stringify(data)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "budget_backup.json";
+    a.click();
+    URL.revokeObjectURL(url);
+    alert("Backup saved!");
+}
+
+// Restore
+document.getElementById("restoreBtn").onclick = ()=>{
+    document.getElementById("restoreInput").click();
+}
+document.getElementById("restoreInput").onchange = (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(evt){
+        try{
+            const data = JSON.parse(evt.target.result);
+            if(data.totalBudget != null && data.remainingBudget != null && Array.isArray(data.expenses)){
+                totalBudget = data.totalBudget;
+                remainingBudget = data.remainingBudget;
+                expenses = data.expenses;
+                renderExpenses();
+                updateUI();
+                saveNewData();
+                alert("Data restored successfully!");
+            } else {
+                alert("Invalid backup file.");
+            }
+        }catch(err){
+            alert("Invalid JSON file.");
+        }
+    };
+    reader.readAsText(file);
+    document.getElementById("restoreInput").value = "";
+}
+
+// Load saved data on startup
+window.onload = loadNewData;
 </script>
-<footer>&copy 2026 | <a href="https://vineetkrishnaswain.github.io/vinivexstudio/"> Designed by Vinivex Studio </a>| All rights are reserved
 
 </body>
 </html>
